@@ -1,0 +1,124 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="#{pageContext.servletContext.contextPath}/resources/template/template.xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <ui:define name="head">
+        <style type="text/css">
+            .ui-datatable {
+                margin-bottom: 25px
+            }
+
+            .ui-datatable .ui-datatable-header {
+                text-align: right !important;
+            }
+
+            .ui-button-text-only .ui-button-text {
+                padding: 0.3em 0.4em;
+            }
+
+            .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-header .ui-chkbox {
+                visibility: hidden;
+            }
+
+            .ui-filter-column .ui-column-customfilter .custom-filter {
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .year-spinner input {
+                width: 100%;
+                box-sizing: border-box;
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content">
+        <h:form prependId="false">
+            <p:messages id="messages" closable="false" escape="false" showDetail="true">
+                <p:autoUpdate />
+            </p:messages>
+            <div class="ui-g">
+                <div class="ui-g-12">
+                    <p:panel id="pnlDatos">
+                        <f:facet name="header">
+                            <i class="fa fa-list-ol verde" style="font-size: 16px;"></i>
+                            <p:spacer width="10"/>
+                            <h:outputText value="Envio de boletas de pago"/>
+                        </f:facet>
+
+                        <p:panelGrid id="pnlFiltro" columns="2" columnClasses="col2_label,col10" 
+                                     style="width: 100%; border:0px none; background-color:transparent;"
+                                     styleClass="form-group ui-panelgrid-blank">
+                            <p:outputLabel for="Nip" value="NIP/Código empleado"/>
+                            <p:inputText id="Nip" value="#{docenteController.correoDocente.nip}" required="true" style="text-transform: uppercase;"
+                                         maxlength="7" disabled="#{docenteController.deshabilitar}"
+                                         validatorMessage="El formato del NIP esta erroneo. Longitud 7">
+                                <f:validateRegex pattern="^([AIai0-9][0-9]{6}+)$"/>
+                            </p:inputText>
+                            <p:outputLabel for="Nombres" value="Nombres" rendered="#{docenteController.mostrar}"/>
+                            <p:inputText id="Nombres" value="#{docenteController.correoDocente.primerNombre}" size="50" style="text-transform: uppercase;" required="true" disabled="#{docenteController.deshabilitar}" rendered="#{docenteController.mostrar}"/>
+                            <p:outputLabel for="Apellidos" value="Apellidos" rendered="#{docenteController.mostrar}"/>
+                            <p:inputText id="Apellidos" value="#{docenteController.correoDocente.primerApellido}" size="50" style="text-transform: uppercase;" required="true" disabled="#{docenteController.deshabilitar}" rendered="#{docenteController.mostrar}"/>
+                            <p:outputLabel for="Nit" value="NIT" rendered="#{docenteController.mostrar}"/>
+                            <p:inputMask id="Nit" value="#{docenteController.correoDocente.nit}" mask="9999-999999-999-9" required="true" disabled="#{docenteController.deshabilitar}" rendered="#{docenteController.mostrar}"/>
+                            <p:outputLabel for="Dui" value="DUI" rendered="#{docenteController.mostrar}"/>
+                            <p:inputMask id="Dui" value="#{docenteController.correoDocente.dui}" mask="99999999-9" required="true" disabled="#{docenteController.deshabilitar}" rendered="#{docenteController.mostrar}"/>
+                            <p:outputLabel for="Correo" value="Correo electrónico"/>
+                            <p:outputPanel>
+                                <p:inputText id="Correo" value="#{docenteController.correoSinDominio}" style="text-transform: lowercase;" disabled="#{docenteController.deshabilitar}" 
+                                             required="true" validatorMessage="Solo se permiten minusculas y caracteres .(punto) _ (guion bajo) - (guion medio) ">
+                                     <f:validateRegex pattern="^[a-z.\S_-]+$" />
+                                </p:inputText>
+                                <p:spacer width="10"/>
+                                <p:selectOneMenu value="#{docenteController.idDominio}">
+                                    <f:selectItems value="#{docenteController.lstDominiosCorreo}" var="dominio" itemValue="#{dominio.idDominio}" itemLabel="#{dominio.dominio}"/>
+                                </p:selectOneMenu>
+                            </p:outputPanel>
+                            
+                            
+                            <p:outputLabel value="Activar"/>
+                            <p:selectBooleanCheckbox value="#{docenteController.correoDocente.activar}"/>
+                        </p:panelGrid>
+
+                        <f:facet name="footer">
+                            <p:commandButton value="Nuevo" action="#{docenteController.nuevoDocente()}" update="pnlFiltro" 
+                                             process="@this" validateClient="true"/>
+                            <p:spacer width="5"/>
+                            <p:commandButton value="Modificar" action="#{docenteController.modificarDocente()}" 
+                                             process="@this" onclick="PF('dlgBusqueda').show();"/>
+                            <p:spacer width="5"/>
+                            <p:commandButton value="Guardar" action="#{docenteController.guardarDocente()}" validateClient="true"/>
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </div>
+
+            <p:dialog id="dlgBusqueda" widgetVar="dlgBusqueda" width="800" modal="true">
+                <p:outputPanel>
+                    <p:outputLabel value="NIP:"/><p:spacer width="5"/>
+                    <p:inputText id="txtCriterio" size="30" value="#{docenteController.criterioBusqueda}"/><p:spacer width="5"/>
+                    <p:commandButton value="Buscar" process="@this,txtCriterio" action="#{docenteController.buscar()}" icon="fa fa-search" update="tblCorreos lblMensaje"/><p:spacer width="5"/>
+                    <p:outputLabel id="lblMensaje" value="#{docenteController.mensaje}" class="ui-message ui-staticmessage ui-message-info ui-widget ui-corner-all" />
+                </p:outputPanel>
+                
+                <br/>
+                <p:dataTable id="tblCorreos" value="#{docenteController.lstCorreoDocente}" var="correo" rowKey="#{correo.idCorreo}"
+                             selection="#{docenteController.docenteSeleccionado}" selectionMode="single">
+                    <p:ajax event="rowSelect" listener="#{docenteController.cerrarDlg}" oncomplete="PF('dlgBusqueda').hide()"  update="pnlDatos"/>
+
+                    <p:column headerText="NIP" width="50">
+                        <p:outputLabel value="#{correo.nip}"/>
+                    </p:column>
+                    <p:column headerText="Correo">
+                        <p:outputLabel value="#{correo.correoElectronico}"/>
+                    </p:column>
+                    <p:column headerText="Nombre Completo">
+                        <p:outputLabel value="#{correo.primerNombre} #{correo.primerApellido}"/>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>

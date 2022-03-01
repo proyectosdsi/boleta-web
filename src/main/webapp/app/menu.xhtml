@@ -1,0 +1,48 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="#{pageContext.servletContext.contextPath}/resources/template/template.xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <ui:define name="head">
+        <script type="text/javascript">
+            function popupConfirm(event) {
+                var respuesta = confirm("¿Esta seguro de querer cargar estos archivos? Luego no se podrán eliminar");
+                if (respuesta == false) {
+                    $(".ui-fileupload-upload").removeClass("ui-state-disabled").removeAttr("aria-disabled").removeAttr("disabled");
+                    event.xhr.abort();
+                }
+            }
+        </script>
+    </ui:define>
+    <ui:define name="content">
+        <h:form prependId="false">
+            <p:panel visible="false">
+                <p:outputLabel value="#{enviarCorreoMB.mes}"/> 
+            </p:panel>
+            <div class="ui-g">
+                <div class="ui-g-12 ui-lg-2">
+
+                </div>
+                <div class="ui-g-12 ui-lg-4">
+                    <div class="card" style="text-align: center;">
+                        <p:commandButton value="Cargar boletas de pago" icon="fa fa-upload" style="font-size: 16px; font-weight: bold;" 
+                                         action="envio.mined"/>
+                    </div>
+                </div>
+
+
+                <div class="ui-g-12  ui-lg-4">
+                    <div class="card" style="text-align: center;">
+                        <p:commandButton value="Cuentas de correo" icon="fa fa-id-card-o" style="font-size: 16px; font-weight: bold;" 
+                                         action="manttoDocente.mined"/>
+                    </div>
+                </div>
+                <div class="ui-g-12 ui-lg-2">
+
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

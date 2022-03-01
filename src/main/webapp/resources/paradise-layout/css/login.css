@@ -1,0 +1,13 @@
+/* Desktop*/
+@media (max-width: 950px) {
+    .login-panel  { 
+        display: block; 
+    }
+
+    .exception-body {
+        display: none;
+    }
+    .ui-g-6 {
+        width: 100%;
+    }
+}

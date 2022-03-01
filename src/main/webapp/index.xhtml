@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <f:facet name="first">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+            <meta name="apple-mobile-web-app-capable" content="yes" />
+            <link href="#{request.contextPath}/resources/images/favicon.png" rel="shortcut icon"/>
+        </f:facet>
+        <title>Boletas de Pago</title>
+        <h:outputScript name="js/nanoscroller.js" library="paradise-layout" />
+        <h:outputScript name="js/layout.js" library="paradise-layout" />
+    </h:head>
+
+    <h:body styleClass="login-body">
+        <h:form>
+            <p:growl id="growl" showDetail="true" escape="false">
+                <p:autoUpdate />
+            </p:growl>
+            <div class="login-panel ui-fluid" style="background-color: #1d1d4c;">
+                <div class="ui-g">
+                    <div class="ui-g-12">
+                        <div class="exception-body ui-g-6" style="margin-top: 70px; background-color: #1d1d4c;">
+                            <p:graphicImage name="logo_login.png" library="images" width="380" />
+                        </div>
+
+                        <div class="ui-g-6" style="background-color: #ffffff;">
+                            <div class="ui-g-12">
+                                <p:outputLabel value="Boletas de Pago" style="font-size: 30px; padding-top: 25px; font-family: 'Bembo Std' !important"/>
+                            </div>
+                            <div class="ui-g-12">
+                                <p:outputLabel for="username" value="Usuario" style="font-size: 18px; font-family: 'Bembo Std' !important"/>
+                                <div class="input-wrapper">
+                                    <p:inputText id="username" styleClass="textMayuscula" onkeyup="return cUpper(this);" placeholder="USUARIO" value="#{loginController.username}"/>
+                                    <i class="fa fa-user" />
+                                </div>
+                            </div>
+                            <div class="ui-g-12">
+                                <p:outputLabel for="password" value="Clave de acceso" style="font-size: 18px; font-family: Bembo Std !important" />
+                                <div class="input-wrapper">
+                                    <p:password id="password" placeholder="CLAVE DE ACCESO" feedback="false" value="#{loginController.password}" />
+                                    <i class="fa fa-lock" />
+                                </div>
+                            </div>
+                            <div class="ui-g-12 button-container">
+                                <p:commandButton id="btnIngresar" value="Ingresar" styleClass="blue-btn raised-btn" action="#{loginController.isUsuarioValido}"/>
+                                <p:blockUI block="btnIngresar" trigger="btnIngresar"  />
+                            </div>
+                            <div class="ui-g-12">
+                                <div class="ui-g-4" style="height: 50px;">
+                                    <h:outputText value="versión #{catalogosGeneralesController.version}" style="font-size: 14px; font-family: 'Bembo Std'"/>
+                                </div>
+                                <div class="ui-g-8" style="text-align: right;">
+                                    <p:ajaxStatus>
+                                        <f:facet name="default">
+                                        </f:facet>
+
+                                        <f:facet name="start">
+                                            <h:outputText value="Espere por favor" style="font-size: 14px; font-family: 'Bembo Std'" />
+                                            <i class="fa fa-spinner fa-spin" style="font-size: 20px;"></i>
+                                        </f:facet>
+
+                                        <f:facet name="complete">
+                                            <h:outputText value="" />
+                                        </f:facet>
+                                    </p:ajaxStatus>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <h:outputStylesheet name="css/nanoscroller.css" library="paradise-layout" />
+                    <h:outputStylesheet name="css/animate.css" library="paradise-layout" />
+                    <h:outputStylesheet name="css/layout-blue.css" library="paradise-layout" />
+                    <h:outputStylesheet name="css/login.css" library="paradise-layout" />
+                </div>
+            </div>
+        </h:form>
+    </h:body>
+
+</html>

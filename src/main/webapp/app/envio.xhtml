@@ -1,0 +1,173 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="#{pageContext.servletContext.contextPath}/resources/template/template.xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <ui:define name="head">
+        <script type="text/javascript">
+            function popupConfirm(event) {
+                var respuesta = confirm("¿Esta seguro de querer cargar estos archivos? Luego no se podrán eliminar");
+                if (respuesta == false) {
+                    $(".ui-fileupload-upload").removeClass("ui-state-disabled").removeAttr("aria-disabled").removeAttr("disabled");
+                    event.xhr.abort();
+                }
+            }
+        </script>
+    </ui:define>
+    <ui:define name="content">
+        <h:form prependId="false">
+            <div class="ui-g">
+                <div class="card ui-g-12">
+                    <h1>
+                        <i class="fa fa-list-ol verde" style="font-size: 16px;"></i>
+                        <p:spacer width="10"/>
+                        <h:outputText value="Envio de boletas de pago"/>
+                    </h1>
+
+                    <p:messages id="messages" showDetail="true" closable="false" escape="false">
+                        <p:autoUpdate />
+                    </p:messages>
+
+                    <h:panelGrid columns="2">
+                        <p:outputLabel value="Seleccione un mes y año referente a la fecha de pago"/> 
+                        <p:outputPanel>
+                            <p:selectOneMenu value="#{boletaMB.mes}">
+                                <f:selectItem itemLabel="ENERO" itemValue="01"/>
+                                <f:selectItem itemLabel="FEBRERO" itemValue="02"/>
+                                <f:selectItem itemLabel="MARZO" itemValue="03"/>
+                                <f:selectItem itemLabel="ABRIL" itemValue="04"/>
+                                <f:selectItem itemLabel="MAYO" itemValue="05"/>
+                                <f:selectItem itemLabel="JUNIO" itemValue="06"/>
+                                <f:selectItem itemLabel="JULIO" itemValue="07"/>
+                                <f:selectItem itemLabel="AGOSTO" itemValue="08"/>
+                                <f:selectItem itemLabel="SEPTIEMBRE" itemValue="09"/>
+                                <f:selectItem itemLabel="OCTUBRE" itemValue="10"/>
+                                <f:selectItem itemLabel="NOVIEMBRE" itemValue="11"/>
+                                <f:selectItem itemLabel="DICIEMBRE" itemValue="12"/>
+                                <p:ajax listener="#{boletaMB.cargarArchivos()}" update="tblPendiente tblProcesado pngResumen updFile"/>
+                            </p:selectOneMenu>
+                            <p:spacer width="5"/>
+                            <p:selectOneMenu value="#{boletaMB.anho}">
+                                <f:selectItem itemLabel="2021" itemValue="2021"/>
+                                <f:selectItem itemLabel="2022" itemValue="2022"/>
+                                <p:ajax listener="#{boletaMB.cargarArchivos()}" update="tblPendiente tblProcesado pngResumen updFile"/>
+                            </p:selectOneMenu>
+                        </p:outputPanel>
+                    </h:panelGrid>
+                    <br/>
+                    <p:outputLabel value="Seleccione los archivos a procesar (Tamaño max. 20MB)"/>
+                    <br/>
+                    <p:fileUpload id="updFile" widgetVar="updFile" fileUploadListener="#{boletaMB.handleFileUpload}" mode="advanced" dragDropSupport="false"
+                                  multiple="true" auto="false" disabled="#{boletaMB.deshabilitar}" allowTypes="/(\.|\/)(pdf)$/" 
+                                  skinSimple="true" label="Seleccionar" uploadLabel="Cargar" cancelLabel="Cancelar" fileLimit="20000000" update="messages tblPendiente"/>
+                    <br/>
+                </div>
+                <div class="ui-g-12 ui-lg-8">
+                    <div class="card">
+                        <h1>Archivos PENDIENTES</h1>
+                        <p:dataTable id="tblPendiente" value="#{boletaMB.lstPendientes}" var="dato">
+                            <p:column headerText="Archivo">
+                                <p:outputLabel value="#{dato.nombreArchivo}"/>
+                            </p:column>
+                            <p:column headerText="Fecha subida" width="80" style="text-align: center;">
+                                <p:outputLabel value="#{dato.fechaCreado}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                </p:outputLabel>
+                            </p:column>
+                            <p:column headerText="Num. Boletas" width="50" style="text-align: right;">
+                                <p:outputLabel value="#{dato.numeroPaginas}">
+                                    <f:convertNumber pattern="#,##0"/>
+                                </p:outputLabel>
+                            </p:column>
+                        </p:dataTable>
+                        <br/>
+                        <h1>Archivos PROCESADOS</h1>
+                        <p:dataTable id="tblProcesado" value="#{boletaMB.lstArchivoOriginales}" var="dato">
+                            <p:column headerText="Archivo">
+                                <p:outputLabel value="#{dato.nombreArchivo}"/>
+                            </p:column>
+                            <p:column headerText="Fecha subida" width="80" style="text-align: center;">
+                                <p:outputLabel value="#{dato.fechaCreado}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                </p:outputLabel>
+                            </p:column>
+                            <p:column headerText="Num. Pag." width="50" style="text-align: right;">
+                                <p:outputLabel value="#{dato.numeroPaginas}">
+                                    <f:convertNumber pattern="#,##0"/>
+                                </p:outputLabel>
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                </div>
+
+
+                <div class="ui-g-12  ui-lg-4">
+                    <div class="card">
+                        <h1>Resumen de las boletas procesas</h1>
+                        <p:panelGrid columns="2" id="pngResumen" style="width: 100%; border:0px none; background-color:transparent;"
+                                     columnClasses="col7, col5_label"
+                                     styleClass="form-group ui-panelgrid-blank">
+                            <p:outputLabel value="Fecha y hora de inicio: "/>
+                            <p:outputLabel value="#{boletaMB.codigoGenerado.fechaInicio}">
+                                <f:convertDateTime pattern="dd/MM/yyyy - HH:mm"/>
+                            </p:outputLabel>
+                            <p:outputLabel value="Fecha y hora de fin: "/>
+                            <p:outputLabel value="#{boletaMB.fechaInicio}">
+                                <f:convertDateTime pattern="dd/MM/yyyy  -  HH:mm" />
+                            </p:outputLabel>
+                            <p:outputLabel value="Número de docentes: "/>
+                            <p:outputLabel value="#{boletaMB.codigoGenerado.enviado}" style="text-align: right;">
+                                <f:convertNumber pattern="#,##0"/>
+                            </p:outputLabel>
+                            <p:outputLabel value="Correos no enviados: "/>
+                            <p:outputPanel>
+                                <p:commandLink value="Ver" action="#{boletaMB.openDlgErrores()}" update="tblErrores">
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                </p:commandLink>
+                                <p:spacer width="10"/>
+                                <p:outputLabel value="#{boletaMB.codigoGenerado.error}" style="text-align: right;">
+                                    <f:convertNumber pattern="#,##0"/>
+                                </p:outputLabel>
+                            </p:outputPanel>
+                            <p:outputLabel value="Docentes sin correo registrado: "/>
+                            <p:outputPanel>
+                                <p:commandLink value="ver" action="#{boletaMB.openDlgNoEviados()}" update="tblNoEnviados">
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                </p:commandLink>
+                                <p:spacer width="10"/>
+                                <p:outputLabel value="#{boletaMB.codigoGenerado.sinCorreo}" style="text-align: right;">
+                                    <f:convertNumber pattern="#,##0"/>
+                                </p:outputLabel>
+                            </p:outputPanel>
+                        </p:panelGrid>
+                    </div>
+                </div>
+            </div>
+
+
+            <p:dialog id="dlgNoEnviados" widgetVar="dlgNoEnviados" header="Listado de NIP sin CORREO" width="500" height="400" modal="true">
+                <p:dataTable id="tblNoEnviados" value="#{boletaMB.lstNoEnviados}" rowIndexVar="rowId" var="nip">
+                    <p:column headerText="#" width="10" style="text-align: center;">
+                        <h:outputText value="#{rowId+1}" />
+                    </p:column>
+                    <p:column headerText="NIP">
+                        <h:outputText value="#{nip}" />
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+            
+            <p:dialog id="dlgErrores" widgetVar="dlgErrores" header="Listado de ERROR de envio" width="500" height="400" modal="true">
+                <p:dataTable id="tblErrores" value="#{boletaMB.lstErrores}" rowIndexVar="rowId" var="nip">
+                    <p:column headerText="#" width="10" style="text-align: center;">
+                        <h:outputText value="#{rowId+1}" />
+                    </p:column>
+                    <p:column headerText="NIP">
+                        <h:outputText value="#{nip}" />
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>
